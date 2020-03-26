@@ -55,9 +55,24 @@ def update(val):
     amort = samort.val
     deltat = sdeltat.val
     time_sim = stime_sim.val
-    l.subplot(111)
-    plt.xlim([0,stime_sim.val])
-
+    t = np.arange(0, time_sim, deltat)
+    ld = []
+    p0 = np.array([0., 0., 0.])
+    p1 = np.array([0., -1., 0.])
+    longueur_0 = np.sqrt(np.dot(p1-p0, p1-p0))
+    p1 = np.array([0., -1.1, 0.])
+    v = np.array([0., 0., 0.])
+    longueur = np.sqrt(np.dot(p1-p0, p1-p0))
+    deltalong = longueur - longueur_0
+    for i in t:
+        ld.append(deltalong)
+        longueur = np.sqrt(np.dot(p1-p0, p1-p0))
+        deltalong = longueur - longueur_0
+        gamma = (-amort*v - k*deltalong * (p1-p0) / longueur)/m
+        v = v + gamma * deltat
+        p1 = p1 + v * deltat   
+    l.set_ydata(ld)
+    l.set_xdata(t)
     fig.canvas.draw_idle()
 
 smasse.on_changed(update)

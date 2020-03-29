@@ -17,8 +17,6 @@ plt.ylabel('Delta length')
 plt.title('Spring Mass')
 
 
-
-
 def creatingData(m = 1.0, k = 0.1, amort = 0.1, deltat = 1.0, time_sim = 50):
     p0 = np.array([0., 0., 0.])
     p1 = np.array([0., -1., 0.])
@@ -97,13 +95,12 @@ resetax = plt.axes([0.0, 0.7, 0.1, 0.1]) #setting the position of the reset butt
 button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 rax = plt.axes([0.0, 0.5, 0.10, 0.15], facecolor=axcolor)
 radio = RadioButtons(rax, ('red', 'blue', 'green'), active=0)
-test = plt.axes([0.0, 0.0, 0.0, 0.0], facecolor=axcolor)
-test.set_visible(False)
+invisibleBtn = plt.axes([0.0, 0.0, 0.0, 0.0], facecolor=axcolor)
+invisibleBtn.set_visible(False)
 
-def radioSettings():
-    rax = plt.axes([0.025, 0.5, 0.15, 0.15], facecolor=axcolor)
-    radio = RadioButtons(rax, ('red', 'blue', 'green'), active=0)
-    return radio
+def colorfunc(label):
+    l.set_color(label)
+    fig.canvas.draw_idle()
 
 def drawPlot():
 
@@ -126,6 +123,7 @@ def drawPlot():
     
     #Reset the data of the sliders
     button.on_clicked(reset)
+    radio.on_clicked(colorfunc)
     
    
     

@@ -10,29 +10,33 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider, Button, RadioButtons
 
 axcolor = 'lightgoldenrodyellow' #color of the slider
+#set label of X and Y
 fig, ax = plt.subplots()
+plt.grid(True)
+plt.ylabel('Delta length')
+plt.title('Spring Mass')
+
+
+
 
 def creatingData(m = 1.0, k = 0.1, amort = 0.1, deltat = 1.0, time_sim = 50):
     p0 = np.array([0., 0., 0.])
     p1 = np.array([0., -1., 0.])
-    longueur_0 = np.sqrt(np.dot(p1-p0, p1-p0))
+    length_init = np.sqrt(np.dot(p1-p0, p1-p0))
     p1 = np.array([0., -1.1, 0.])
     v = np.array([0., 0., 0.])
-    longueur = np.sqrt(np.dot(p1-p0, p1-p0))
-    deltalong = longueur - longueur_0
+    length_updated = np.sqrt(np.dot(p1-p0, p1-p0))
+    deltalen = length_updated - length_init
     dataY = []
     dataX = np.arange(0, time_sim, deltat)
     for i in dataX:
-       dataY.append(deltalong)
-       longueur = np.sqrt(np.dot(p1-p0, p1-p0))
-       deltalong = longueur - longueur_0
-       gamma = (-amort*v - k*deltalong * (p1-p0) / longueur)/m
-       v = v + gamma * deltat
+       dataY.append(deltalen)
+       length_updated = np.sqrt(np.dot(p1-p0, p1-p0))
+       deltalen = length_updated - length_init
+       gamma = (-amort*v - k*deltalen * (p1-p0) / length_updated)/m
+       v = v + gamma * deltat #updat
        p1 = p1 + v * deltat   
-    return dataY, dataX
-
-a,b  = creatingData()
-l, =plt.plot(b,a)
+    return dataX, dataY
 
 def SliderSettings():
     #setting the position and color of the sliders 
@@ -43,12 +47,16 @@ def SliderSettings():
     axtime_sim = plt.axes([0.25, 0.05, 0.65, 0.03], facecolor=axcolor)
     
     #creating all the sliders with their position, title, min, max and default value 
-    smasse = Slider(axmasse, 'Mass', 0.1, 7.0, valinit=2)
-    sraideur = Slider(axraideur, 'Stiffness', 0, 1, valinit=0.5)
-    samort = Slider(axamort, 'Amortization', 0, 1.0, valinit=0.5)
-    sdeltat = Slider(axdeltat, 'Step of integration', 0.1, 5.0, valinit=3)
+    smasse = Slider(axmasse, 'Mass', 0.1, 7.0, valinit=1)
+    sraideur = Slider(axraideur, 'Stiffness', 0, 0.5, valinit=0.1)
+    samort = Slider(axamort, 'Amortization', 0, 0.5, valinit=0.1)
+    sdeltat = Slider(axdeltat, 'Step of integration', 0.1, 5.0, valinit=1)
     stime_sim = Slider(axtime_sim, 'Simulation time', 0.1, 200.0, valinit=50)
+    
     return smasse,sraideur,samort,sdeltat,stime_sim
+
+dataX,dataY  = creatingData()
+l, =plt.plot(dataX,dataY)
 
 smasse,sraideur,samort,sdeltat,stime_sim = SliderSettings()
 
@@ -59,7 +67,7 @@ def update(val):
     params:
         val: is the value of the slider 
     '''
-    dataY,dataX = creatingData(smasse.val,sraideur.val,samort.val,sdeltat.val,stime_sim.val)# retrieve new data with updated values
+    dataX,dataY = creatingData(smasse.val,sraideur.val,samort.val,sdeltat.val,stime_sim.val)# retrieve new data with updated values
     print(dataY) #print the new data in the terminal 
     l.set_ydata(dataY) # change the Y data of the graph
     l.set_xdata(dataX) # change the X data of the graph
@@ -85,19 +93,29 @@ def buttonSettings():
     button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
     return button
 
+resetax = plt.axes([0.0, 0.7, 0.1, 0.1]) #setting the position of the reset button 
+button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
+rax = plt.axes([0.0, 0.5, 0.10, 0.15], facecolor=axcolor)
+radio = RadioButtons(rax, ('red', 'blue', 'green'), active=0)
+test = plt.axes([0.0, 0.0, 0.0, 0.0], facecolor=axcolor)
+test.set_visible(False)
+
 def radioSettings():
     rax = plt.axes([0.025, 0.5, 0.15, 0.15], facecolor=axcolor)
     radio = RadioButtons(rax, ('red', 'blue', 'green'), active=0)
     return radio
 
 def drawPlot():
-    plt.subplots_adjust(left=0.25, bottom=0.35)
-    data, time = creatingData()
-    l, =plt.plot(time, data)
-    ax.margins(x=0)
+
     
-    button = buttonSettings() # creating button reset
-    radioSettings() # creating radios buttons
+    
+    plt.subplots_adjust(left=0.25, bottom=0.35)
+    dataX, dataY = creatingData()
+    
+      
+    
+    l, =plt.plot(dataX, dataY)
+    ax.margins(x=0)
     
     #Updating the graph by moving any sliders
     smasse.on_changed(update) 
@@ -106,9 +124,14 @@ def drawPlot():
     sdeltat.on_changed(update)
     stime_sim.on_changed(update)
     
+    #Reset the data of the sliders
     button.on_clicked(reset)
     
+   
+    
+    #display the graph
     plt.show()
+
 
 if __name__ == '__main__':
     drawPlot()

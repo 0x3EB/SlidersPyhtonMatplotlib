@@ -50,12 +50,7 @@ sdeltat = Slider(axdeltat, 'Deltat t', 0.1, 5.0, valinit=deltat)
 stime_sim = Slider(axtime_sim, 'time_sim', 0.1, 100.0, valinit=time_sim)
 
 def update(val):
-    m = smasse.val
-    k = sraideur.val
-    amort = samort.val
-    deltat = sdeltat.val
-    time_sim = stime_sim.val
-    t = np.arange(0, time_sim, deltat)
+    t = np.arange(0, stime_sim.val, sdeltat.val)
     ld = []
     p0 = np.array([0., 0., 0.])
     p1 = np.array([0., -1., 0.])
@@ -68,11 +63,13 @@ def update(val):
         ld.append(deltalong)
         longueur = np.sqrt(np.dot(p1-p0, p1-p0))
         deltalong = longueur - longueur_0
-        gamma = (-amort*v - k*deltalong * (p1-p0) / longueur)/m
+        gamma = (-samort.val*v - sraideur.val*deltalong * (p1-p0) / longueur)/smasse.val
         v = v + gamma * deltat
-        p1 = p1 + v * deltat   
+        p1 = p1 + v * deltat
+    print(ld) #print the new data in the terminal 
     l.set_ydata(ld)
     l.set_xdata(t)
+    ax.set_xlim(min(t), max(t)) #set the scale of the x axis
     fig.canvas.draw_idle()
 
 smasse.on_changed(update)

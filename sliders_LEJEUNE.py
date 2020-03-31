@@ -44,21 +44,21 @@ def creatingData(m = 1.0, k = 0.1, amort = 0.1, deltat = 1.0, time_sim = 50):
     '''
     p0 = np.array([0., 0., 0.])
     p1 = np.array([0., -1., 0.])
-    length_init = np.sqrt(np.dot(p1-p0, p1-p0))
-    p1 = np.array([0., -1.1, 0.])
-    v = np.array([0., 0., 0.])
+    length_init = np.sqrt(np.dot(p1-p0, p1-p0))# calculating the length between the 2 points (p1 and p2)
+    p1 = np.array([0., -1.1, 0.]) # update the point (p1)
+    s = np.array([0., 0., 0.]) # speed vector
     length_updated = np.sqrt(np.dot(p1-p0, p1-p0))
     deltalen = length_updated - length_init
-    dataY = []
+    dataY = [] #empty array to store the data 
     dataX = np.arange(0, time_sim, deltat)
-    for i in dataX:
-       dataY.append(deltalen)
+    for i in dataX: #looping during the simulation time 
+       dataY.append(deltalen) # fill the array with the value of Y
        length_updated = np.sqrt(np.dot(p1-p0, p1-p0))
        deltalen = length_updated - length_init
-       gamma = (-amort*v - k*deltalen * (p1-p0) / length_updated)/m
-       v = v + gamma * deltat #updat
-       p1 = p1 + v * deltat   
-    return dataX, dataY
+       gamma = (-amort*s - k*deltalen * (p1-p0) / length_updated)/m
+       s +=  gamma * deltat #update the speed vector
+       p1 += s * deltat #update the point (p1) with the speed and the step of integration  
+    return dataX, dataY #return the 2 arrays with all the values to build the graph
 
 def SliderSettings():
     '''
@@ -78,7 +78,7 @@ def SliderSettings():
         slider for the Simulation time.
 
     '''
-    #setting the position and color of the sliders 
+    #setting the position and color of the sliders with axis
     sliderMassAxis = plt.axes([0.25, 0.20, 0.65, 0.03], facecolor=axcolor)
     sliderStiffnessAxis = plt.axes([0.25, 0.25, 0.65, 0.03], facecolor=axcolor)
     sliderAmortAxis = plt.axes([0.25, 0.15, 0.65, 0.03], facecolor=axcolor)
